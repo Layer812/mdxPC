@@ -42,6 +42,17 @@ int mdx_cmd_len(uint8_t *data, int pos, int len) {
 	}
 	return 1;
 }
+// mdxCP/  quick hack for get pdxname / Layer8
+
+char *mdx_file_get_pdxname(uint8_t *data, int len){
+  int i;
+  uint8_t *ptr = NULL;
+  for(i = 0; i < len; i++)
+    if(data[i] == 0x0d && data[i + 1] == 0x0a && data[i + 2] == 0x1a)
+      ptr = &(data[i + 3]);
+
+  return ptr;
+}
 
 int mdx_file_load(struct mdx_file *f, uint8_t *data, int len) {
 	int i;
@@ -88,7 +99,6 @@ int mdx_file_load(struct mdx_file *f, uint8_t *data, int len) {
 		data[offsetstart + 6] == 'X') {
 		return MDX_ERR_LZX;
 	}
-
 	// 1 chunk for OPM voices and 16 chunks for track data
 	struct {
 		int offset, len;
@@ -107,6 +117,7 @@ int mdx_file_load(struct mdx_file *f, uint8_t *data, int len) {
 	}
 	f->num_tracks = (min_ofs - 2) / 2;
 	if(f->num_tracks > 16) f->num_tracks = 16;
+
 	// calculate lengths
 	for(int i = 0; i < 17; i++) {
 		if(!chunks[i].len) continue;
@@ -149,7 +160,6 @@ int mdx_file_load(struct mdx_file *f, uint8_t *data, int len) {
 		uint8_t *vptr = f->data + voice_data_offset + i * 27;
 		f->voices[f->data[voice_data_offset + i * 27]] = vptr;
 	}
-
 	return 0;
 }
 

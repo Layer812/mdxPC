@@ -12,9 +12,8 @@ enum {
 	MDX_ERR_LZX, // MDX file is compressed with LZX
 	MDX_MAX_ERR
 };
-
-struct mdx_file;
-
+// mdxCP/  fore reducing memory / Layer8
+// struct mdx_file;
 struct mdx_lfo {
 	int enable, waveform, period, amplitude, phase, pitch;
 };
@@ -55,6 +54,8 @@ struct mdx_file {
 	struct mdx_track tracks[16];
 	int num_tracks;
 };
+// mdxCP/  quick hack for get pdxname / Layer8
+char *mdx_file_get_pdxname(uint8_t *data, int len);
 
 int mdx_file_load(struct mdx_file *f, uint8_t *data, int len);
 

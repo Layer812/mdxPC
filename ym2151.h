@@ -210,7 +210,8 @@ void ym2151_reset_chip(struct ym2151 *ym2151);
  * '**buffers' is table of pointers to the buffers: left and right
  * 'length' is the number of samples that should be generated
  */
-void ym2151_update_one(struct ym2151 *ym2151, SAMP **buffers, int length);
+// mdxCP/ to reduce cpu usage support mono sound / Layer8
+void ym2151_update_one(struct ym2151 *ym2151, SAMP *buffers, int length);
 
 /* write 'v' to register 'r' on YM2151 */
 void ym2151_write_reg(struct ym2151 *ym2151, int r, int v);

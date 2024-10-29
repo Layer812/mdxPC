@@ -31,7 +31,8 @@ __extension__ typedef signed long long		INT64;
 typedef UINT32	offs_t;
 
 /* stream_sample_t is used to represent a single sample in a sound stream */
-typedef INT32 stream_sample_t;
+// mdxCP/  fore reducing memory / Layer8
+typedef short stream_sample_t;
 
 #if defined(VGM_BIG_ENDIAN)
 #define BYTE_XOR_BE(x)	 (x)

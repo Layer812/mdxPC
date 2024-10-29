@@ -1,27 +1,10 @@
 #include <string.h>
 
 #include "adpcm_pcm_mix_driver.h"
-#include "speex_resampler.h"
-#include "fixed_resampler.h"
+// mdxCP/  to reduce memory & cpu ussage, change resample method / Layer8
 #include "mamedef.h"
 
-// static int oki_clocks[5] = {
-// 	4000000, 4000000, 4000000, 8000000, 8000000,
-// };
-
-// static int oki_divs[5] = {
-// 	1024, 768, 512, 768, 512
-// };
-
-stream_sample_t sinctbl4[] = {
-#include "sinctbl4.h"
-};
-
-stream_sample_t sinctbl3[] = {
-#include "sinctbl3.h"
-};
-
-static uint16_t adpcm_mixer_calc_vol(uint8_t vol) {
+uint16_t adpcm_mixer_calc_vol(uint8_t vol) {
 	const uint8_t vol_00_0f[] = {
 		0x6B, 0x6F, 0x71, 0x74, 0x76, 0x79, 0x7B, 0x7D,
 		0x80, 0x82, 0x84, 0x87, 0x8A, 0x8C, 0x8F, 0x91,
@@ -46,239 +29,135 @@ static uint16_t adpcm_mixer_calc_vol(uint8_t vol) {
 	return 0;
 }
 
-static int adpcm_mix_driver_channel_set_volume(struct adpcm_mix_driver_channel *chan, uint8_t volume) {
+int adpcm_mix_driver_channel_set_volume(struct adpcm_driver_channel *chan, uint8_t volume) {
 	chan->volume = adpcm_mixer_calc_vol(volume);
 
 	return 0;
 }
 
-static int adpcm_mix_driver_channel_init(struct adpcm_mix_driver_channel *channel) {
-	channel->data = NULL;
+int adpcm_mix_driver_channel_init(struct adpcm_driver_channel *channel, int chno) {
+	channel->chdata = NULL;
 	channel->data_len = 0;
-	adpcm_init(&channel->decoder_status);
+  channel->chno = chno;
 	adpcm_mix_driver_channel_set_volume(channel, 15);
+	channel->data_pos = 0;
+  channel->skip = channel->cnt= 0;
 
 	return 0;
 }
 
-static void adpcm_mix_driver_channel_deinit(struct adpcm_mix_driver_channel *channel) {
-	channel->data = NULL;
+void adpcm_mix_driver_channel_deinit(struct adpcm_driver_channel *channel) {
+	channel->chdata = NULL;
 	channel->data_len = 0;
+	channel->data_pos = 0;
+  channel->skip = channel->cnt= 0;
 }
 
-static int adpcm_mix_driver_channel_is_active(struct adpcm_mix_driver_channel *channel) {
-	return channel->data && channel->data_pos < channel->data_len;
+int adpcm_mix_driver_channel_is_active(struct adpcm_driver_channel *channel) {
+	return (channel->data_len != 0);
 }
 
-static stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_mix_driver_channel *channel) {
-	if(!adpcm_mix_driver_channel_is_active(channel))
+stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel *channel, int k) {
+	if(channel->data_len == 0){
 		return 0;
-
-	uint8_t b = channel->data[channel->data_pos];
-	if(channel->nybble) {
-		b >>= 4;
-	} else {
-		b &= 0x0f;
+  }
+  // mdxCP/ quick & dirty hack for resample  / Layer8
+	if(channel->cnt < channel->skip){
+		channel->cnt += 320;
+		return 0;
 	}
 
-	stream_sample_t sample = adpcm_decode(b, &channel->decoder_status);
+	channel->cnt = 0;
+	stream_sample_t sample = channel->chdata[channel->data_pos];
+	channel->data_pos = (channel->data_pos >= channel->data_len)? 0: channel->data_pos + 1;
 	sample = channel->volume * sample / 1024;
 	if(sample > 32767) sample = 32767;
 	if(sample < -32767) sample = -32767;
-
-	if(channel->nybble) {
-		channel->data_pos++;
-		channel->nybble = 0;
-	} else {
-		channel->nybble = 1;
-	}
-
 	return sample;
 }
 
-static int adpcm_mix_driver_channel_play(struct adpcm_mix_driver_channel *channel, uint8_t *data, int data_len, uint8_t freq_num, uint8_t volume) {
-	adpcm_init(&channel->decoder_status);
-
-	channel->data = data;
+int adpcm_mix_driver_channel_play(struct adpcm_driver_channel *channel, short *data, int data_len, uint8_t freq_num, uint8_t volume, uint8_t slot) {
+	channel->chdata = data;
 	channel->data_len = data_len;
 	channel->freq_num = freq_num;
+	channel->skip = 44100 * 100 / (freqtbl[freq_num] + 1);
+	channel->cnt = 0;
+	channel->slot = slot;
 	adpcm_mix_driver_channel_set_volume(channel, volume);
-
 	channel->data_pos = 0;
-	channel->nybble = 0;
-
 	return 0;
 }
 
-static int adpcm_mix_driver_channel_stop(struct adpcm_mix_driver_channel *chan) {
-	chan->data = 0;
+int adpcm_mix_driver_channel_stop(struct adpcm_driver_channel *chan) {
+	chan->chdata = 0;
 	chan->data_len = 0;
 	chan->volume = 0;
 	chan->data_pos = 0;
-	chan->nybble = 0;
+	chan->cnt = 0;
 
 	return 0;
 }
 
-static int adpcm_mix_driver_channel_set_freq(struct adpcm_mix_driver_channel *chan, uint8_t freq_num) {
+int adpcm_mix_driver_channel_set_freq(struct adpcm_driver_channel *chan, uint8_t freq_num) {
 	chan->freq_num = freq_num;
-
+	return 0;
+}
+// mdxCP/  to reduce memory & cpu ussage, adpcm decode at begining / Layer8
+int adpcm_pcm_mix_driver_alloc_buffers(struct adpcm_driver *driver, int buf_size) {
 	return 0;
 }
 
-static int adpcm_pcm_mix_driver_alloc_buffers(struct adpcm_pcm_mix_driver *driver, int buf_size) {
-	if(driver->buf_size != buf_size) {
-		driver->buf_size = buf_size;
-		// TODO: error checking
-		driver->decode_buf = realloc(driver->decode_buf, driver->buf_size * sizeof(*driver->decode_buf));
-		driver->decode_resample_buf = realloc(driver->decode_resample_buf, driver->buf_size * sizeof(*driver->decode_resample_buf));
-		driver->mix_buf_l = realloc(driver->mix_buf_l, driver->buf_size * sizeof(*driver->mix_buf_l));
-		driver->mix_buf_r = realloc(driver->mix_buf_r, driver->buf_size * sizeof(*driver->mix_buf_r));
-		if(!driver->decode_buf || !driver->decode_resample_buf || !driver->mix_buf_l || !driver->mix_buf_r)
-			return 1;
-	}
-
-	return 0;
+int adpcm_pcm_mix_driver_play(struct adpcm_driver *driver, uint8_t channel,  stream_sample_t *data, int data_len, uint8_t freq_num, uint8_t volume, uint8_t slot) {
+	return adpcm_mix_driver_channel_play(&driver->channels[channel], data, data_len, freq_num, volume, slot);
 }
 
-static int adpcm_pcm_mix_driver_play(struct adpcm_driver *driver, uint8_t channel, uint8_t *data, int data_len, uint8_t freq_num, uint8_t volume) {
-	struct adpcm_pcm_mix_driver *pdrv = (struct adpcm_pcm_mix_driver *)driver;
-	return adpcm_mix_driver_channel_play(&pdrv->channels[channel], data, data_len, freq_num, volume);
+int adpcm_pcm_mix_driver_stop(struct adpcm_driver *driver, uint8_t channel) {
+	return adpcm_mix_driver_channel_stop(&driver->channels[channel]);
 }
 
-static int adpcm_pcm_mix_driver_stop(struct adpcm_driver *driver, uint8_t channel) {
-	struct adpcm_pcm_mix_driver *pdrv = (struct adpcm_pcm_mix_driver *)driver;
-	return adpcm_mix_driver_channel_stop(&pdrv->channels[channel]);
+int adpcm_pcm_mix_driver_set_freq(struct adpcm_driver *driver, uint8_t channel, uint8_t freq) {
+	return adpcm_mix_driver_channel_set_freq(&driver->channels[channel], freq);
 }
 
-static int adpcm_pcm_mix_driver_set_freq(struct adpcm_driver *driver, uint8_t channel, uint8_t freq) {
-	struct adpcm_pcm_mix_driver *pdrv = (struct adpcm_pcm_mix_driver *)driver;
-	return adpcm_mix_driver_channel_set_freq(&pdrv->channels[channel], freq);
+int adpcm_pcm_mix_driver_set_volume(struct adpcm_driver *driver, uint8_t channel, uint8_t vol) {
+	return adpcm_mix_driver_channel_set_volume(&driver->channels[channel], vol);
 }
-
-static int adpcm_pcm_mix_driver_set_volume(struct adpcm_driver *driver, uint8_t channel, uint8_t vol) {
-	struct adpcm_pcm_mix_driver *pdrv = (struct adpcm_pcm_mix_driver *)driver;
-	return adpcm_mix_driver_channel_set_volume(&pdrv->channels[channel], vol);
-}
-
-static int adpcm_pcm_mix_driver_set_pan(struct adpcm_driver *driver, uint8_t pan) {
+int adpcm_pcm_mix_driver_set_pan(struct adpcm_driver *driver, uint8_t pan) {
 	driver->pan = pan & 0x03;
 	return 0;
 }
 
-int adpcm_pcm_mix_driver_init(struct adpcm_pcm_mix_driver *driver, int sample_rate, int buf_size) {
-	adpcm_driver_init(&driver->adpcm_driver);
-	driver->adpcm_driver.play = adpcm_pcm_mix_driver_play;
-	driver->adpcm_driver.stop = adpcm_pcm_mix_driver_stop;
-	driver->adpcm_driver.set_freq = adpcm_pcm_mix_driver_set_freq;
-	driver->adpcm_driver.set_volume = adpcm_pcm_mix_driver_set_volume;
-	driver->adpcm_driver.set_pan = adpcm_pcm_mix_driver_set_pan;
+int adpcm_pcm_mix_driver_init(struct adpcm_driver *driver, int sample_rate, int buf_size) {
+	adpcm_driver_init(driver);
+	driver->play = adpcm_pcm_mix_driver_play;
+	driver->stop = adpcm_pcm_mix_driver_stop;
+	driver->set_freq = adpcm_pcm_mix_driver_set_freq;
+	driver->set_volume = adpcm_pcm_mix_driver_set_volume;
+	driver->set_pan = adpcm_pcm_mix_driver_set_pan;
 
 	for(int i = 0; i < 8; i++) {
-		adpcm_mix_driver_channel_init(&driver->channels[i]);
+		adpcm_mix_driver_channel_init(&driver->channels[i], i);
 	}
-
-	fixed_resampler_init(&driver->resamplers[0], sinctbl4, 1, 26, 1, 4); //  3906.25
-	fixed_resampler_init(&driver->resamplers[1], sinctbl3, 1, 26, 1, 3); //  5208.33
-	fixed_resampler_init(&driver->resamplers[2], sinctbl4, 2, 26, 1, 2); //  7812.50
-	fixed_resampler_init(&driver->resamplers[3], sinctbl3, 1, 26, 2, 3); // 10416.67
-
-	adpcm_init(&driver->encoder_status);
-
-	driver->buf_size = 0;
-	driver->decode_buf = driver->decode_resample_buf = driver->mix_buf_l = driver->mix_buf_r = 0;
-	adpcm_pcm_mix_driver_alloc_buffers(driver, buf_size);
-
-	int err = RESAMPLER_ERR_SUCCESS;
-	driver->output_resampler = speex_resampler_init(2, 15625, sample_rate, SPEEX_RESAMPLER_QUALITY_DEFAULT, &err);
-	if(err != RESAMPLER_ERR_SUCCESS || !driver->output_resampler) {
-		return -1;
-	}
-
 	return 0;
 }
 
-void adpcm_pcm_mix_driver_deinit(struct adpcm_pcm_mix_driver *driver) {
-	speex_resampler_destroy(driver->output_resampler);
-	driver->output_resampler = NULL;
-
-	// no ADPCM status deinit
-
-	for(int i = 0; i < 4; i++) {
-		fixed_resampler_deinit(&driver->resamplers[i]);
-	}
-
+void adpcm_pcm_mix_driver_deinit(struct adpcm_driver *driver) {
 	for(int i = 0; i < 8; i++) {
 		adpcm_mix_driver_channel_deinit(&driver->channels[i]);
 	}
 }
+int adpcm_pcm_mix_driver_run(struct adpcm_driver *driver, stream_sample_t *buf_l, int buf_size) {
+  int j, k;
+  struct adpcm_driver_channel *chanp;
 
-int adpcm_pcm_mix_driver_estimate(struct adpcm_pcm_mix_driver *driver, int buf_size) {
-	spx_uint32_t in_len = 1, out_len = buf_size;
-	speex_resampler_estimate(driver->output_resampler, 0, &in_len, &out_len);
-	return out_len;
-}
-
-int adpcm_pcm_mix_driver_run(struct adpcm_pcm_mix_driver *driver, stream_sample_t *buf_l, stream_sample_t *buf_r, int buf_size) {
-	int r = adpcm_pcm_mix_driver_alloc_buffers(driver, buf_size);
-	if(r != 0)
-		return r;
-
-	speex_resampler_set_input_stride(driver->output_resampler, 1);
-	speex_resampler_set_output_stride(driver->output_resampler, 1);
-	spx_uint32_t in_len = buf_size, out_len = buf_size;
-	speex_resampler_estimate(driver->output_resampler, 0, &in_len, &out_len);
-
-	memset(driver->mix_buf_l, 0, in_len * sizeof(*driver->mix_buf_l));
-	memset(driver->mix_buf_r, 0, in_len * sizeof(*driver->mix_buf_r));
-
-	stream_sample_t samp;
-
-	for(int i = 0; i < 5; i++) {
-		memset(driver->decode_buf, 0, in_len * sizeof(*driver->decode_buf));
-		if(i < 4) {
-			int estimated_in_len = fixed_resampler_estimate(&driver->resamplers[i], in_len);
-			int fixed_in_len = estimated_in_len;
-			int fixed_out_len = in_len;
-			for(int j = 0; j < 8; j++) {
-				struct adpcm_mix_driver_channel *chan = &driver->channels[j];
-				if(chan->freq_num != i)
-					continue;
-
-				for(int k = 0; k < estimated_in_len; k++) {
-					samp = adpcm_mix_driver_channel_get_sample(chan);
-					driver->decode_buf[k] += samp;
-				}
-			}
-
-			fixed_resampler_resample(&driver->resamplers[i], driver->decode_buf, &fixed_in_len, driver->decode_resample_buf, &fixed_out_len);
-
-			for(int k = 0; k < in_len; k++) {
-				driver->mix_buf_l[k] += driver->adpcm_driver.pan & 0x01 ? driver->decode_resample_buf[k] : 0;
-				driver->mix_buf_r[k] += driver->adpcm_driver.pan & 0x02 ? driver->decode_resample_buf[k] : 0;
-			}
-		} else {
-			for(int j = 0; j < 8; j++) {
-				struct adpcm_mix_driver_channel *chan = &driver->channels[j];
-				if(chan->freq_num != i)
-					continue;
-
-				for(int k = 0; k < in_len; k++) {
-					samp = adpcm_mix_driver_channel_get_sample(chan);
-					driver->mix_buf_l[k] += driver->adpcm_driver.pan & 0x01 ? samp : 0;
-					driver->mix_buf_r[k] += driver->adpcm_driver.pan & 0x02 ? samp : 0;
-				}
-			}
-		}
+	for(j = 0; j < 8; j++) {
+    chanp = &(driver->channels[j]); 
+    if(chanp->data_len == 0){
+      continue;
+    }
+		for(k = 0; k < buf_size; k++) {
+			buf_l[k] += adpcm_mix_driver_channel_get_sample(chanp, k);
+	  }
 	}
-
-	spx_uint32_t in_len_l = buf_size;
-	spx_uint32_t out_len_l = buf_size;
-	speex_resampler_process_int(driver->output_resampler, 0, driver->mix_buf_l, &in_len_l, buf_l, &out_len_l);
-
-	spx_uint32_t in_len_r = buf_size;
-	spx_uint32_t out_len_r = buf_size;
-	speex_resampler_process_int(driver->output_resampler, 1, driver->mix_buf_r, &in_len_r, buf_r, &out_len_r);
-
 	return 0;
 }

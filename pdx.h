@@ -6,7 +6,8 @@
 #define PDX_NUM_SAMPLES 96
 
 struct pdx_sample {
-	uint8_t *data;
+// mdxCP/ pdx file load on flash / Layer8
+	int ofs;
 	int len;
 	int16_t *decoded_data;
 	int num_samples;
@@ -17,6 +18,6 @@ struct pdx_file {
 	int num_samples;
 };
 
-int pdx_file_load(struct pdx_file *pdx, uint8_t *data, int data_len);
+// int pdx_file_load(struct pdx_file *pdx, uint8_t *data, int data_len);
 
 #endif /* PDX_H_ */

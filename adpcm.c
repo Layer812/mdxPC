@@ -9,11 +9,22 @@
 
 # include "adpcm.h"
 
+// mdxCP: to reduce memory & cpu ussage, change resample method / Layer8
+const int adpcm_estimindex[16] = {
+	 2,  6,  10,  14,  18,  22,  26,  30,
+	-2, -6, -10, -14, -18, -22, -26, -30
+};
+const int adpcm_estimstep[16] = {
+	-1, -1, -1, -1, 2, 4, 6, 8,
+	-1, -1, -1, -1, 2, 4, 6, 8
+};
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+
+
 /* Note: Edgar's book says that the second to last value is 1408; however,
  * The standard says it is 1411.
  * Changed on 1/17/2003.
 */
-
 static short step_size[49] = { 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41,
      45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173,
      190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
@@ -31,6 +42,7 @@ void adpcm_init( struct adpcm_status *stat ) {
     stat->step_index = 0;
     return;
 }
+
 
 /*
 * Encode linear to ADPCM
@@ -77,7 +89,7 @@ short adpcm_decode( char code, struct adpcm_status *stat ) {
 
     /* printf( "%x\t", code );
     */
-    SS = step_size[stat->step_index];
+    SS = step_size[stat->step_index % 49];
     E = SS/8;
     if ( code & 0x01 )
         E += SS/4;

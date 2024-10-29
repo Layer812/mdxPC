@@ -65,4 +65,7 @@ void mdx_driver_tick(struct mdx_driver *driver);
 int mdx_driver_load(struct mdx_driver *driver, struct mdx_file *file, struct pdx_file *pfile);
 int mdx_driver_start_fadeout(struct mdx_driver *driver, int fade_rate);
 
+// mdxCP/ mdx file load on heap ;< / Layer8
+void mdx_driver_free(struct mdx_driver *driver);
+
 #endif /* MDX_DRIVER_H_ */

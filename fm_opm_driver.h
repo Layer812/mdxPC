@@ -6,9 +6,7 @@
 /* OPM driver */
 struct fm_opm_driver {
 	struct fm_driver fm_driver;
-
-	uint8_t opm_cache[256];
-
+// mdxCP/  to reduce memory delete unused buffer/ Layer8
 	void (*write)(struct fm_opm_driver *driver, uint8_t reg, uint8_t val);
 };
 void fm_opm_driver_init(struct fm_opm_driver *driver);

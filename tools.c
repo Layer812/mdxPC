@@ -7,102 +7,9 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <libgen.h>
-#ifndef WIN32
-#include <unistd.h>
-#ifndef __EMSCRIPTEN__
-#include <zlib.h>
-#endif /* __EMSCRIPTEN */
-#endif
 #include "tools.h"
 
-uint8_t *load_file(const char *filename, size_t *size_out) {
-	FILE *f = fopen(filename, "rb");
-	if(!f) {
-		fprintf(
-			stderr,
-			"Could not open %s: %s (%d)\n",
-			filename,
-			strerror(errno),
-			errno
-		);
-		return NULL;
-	}
-	fseek(f, 0, SEEK_END);
-	size_t size = ftell(f);
-	uint8_t *data = malloc(size);
-	if(!data) {
-		fprintf(
-			stderr,
-			"Could not allocate %zu bytes for %s: %s (%d)\n",
-			size, filename, strerror(errno), errno
-		);
-		fclose(f);
-		return NULL;
-	}
-	rewind(f);
-	fread(data, 1, size, f);
-	fclose(f);
-
-	if(size_out) *size_out = size;
-	return data;
-}
-
-#ifndef WIN32
-#ifndef __EMSCRIPTEN__
-uint8_t *load_gzfile(const char *filename, size_t *size_out) {
-	gzFile f = gzopen(filename, "rb");
-	if(!f) {
-		fprintf(
-			stderr,
-			"Could not open %s: %s (%d)\n",
-			filename,
-			strerror(errno),
-			errno
-		);
-		return NULL;
-	}
-
-	uint8_t *data = malloc(1024);
-	if(!data) {
-		fprintf(
-			stderr,
-			"Could not allocate 1024 bytes for %s: %s (%d)\n",
-			filename, strerror(errno), errno
-		);
-		gzclose(f);
-		return NULL;
-	}
-	size_t size = 0;
-	while(1) {
-		int r = gzread(f, data + size, 1024);
-		if(r < 0) break;
-		size += r;
-		if(r == 1024) {
-			data = realloc(data, size + 1024);
-			if(!data) {
-				fprintf(
-					stderr,
-					"Could not reallocate from %lu bytes to %lu bytes for %s: %s (%d)\n",
-					(unsigned long)size, (unsigned long)size + 1024, filename, strerror(errno), errno
-				);
-				gzclose(f);
-				return NULL;
-			}
-		} else break;
-	}
-	gzclose(f);
-
-	if(size_out) *size_out = size;
-	return data;
-}
-#endif /* __EMSCRIPTEN */
-#endif /* WIN32 */
-
-#ifdef __MINGW32__
-int alphasort(const struct dirent **a, const struct dirent **b) {
-	return strcmp((*a)->d_name, (*b)->d_name);
-}
-#endif
+// mdxCP/ pdx file load on flash / Layer8
 
 int gcd(int a, int b) {
 	int c = a % b;
@@ -115,49 +22,8 @@ int gcd(int a, int b) {
 
 	return b;
 }
-int find_pdx_file(const char *mdx_file_path, const char *pdx_filename, char *out, int out_len) {
-	char *s = strdup(mdx_file_path);
-	char *dn = dirname(s);
 
-	char buf[256];
-	struct stat st;
 
-	*out = 0;
-
-	for(int i = 0; i < 2; i++) {
-		if(i == 0) {
-			snprintf(buf, sizeof(buf), "%s", pdx_filename);
-		} else {
-			snprintf(buf, sizeof(buf), "%s.PDX", pdx_filename);
-		}
-		int r = stat(buf, &st);
-		if(r == 0) {
-			strncpy(out, buf, out_len);
-			goto good;
-		}
-
-		DIR *d;
-		struct dirent *dir;
-		d = opendir(dn);
-		int found = 0;
-		if(d) {
-			while((dir = readdir(d)) != NULL) {
-				if(!strcasecmp(dir->d_name, buf)) {
-					snprintf(out, out_len, "%s/%s", dn, dir->d_name);
-					found = 1;
-				}
-			}
-			closedir(d);
-		}
-
-		if(found)
-			goto good;
-	}
-
-good:
-	free(s);
-	return 0;
-}
 
 void csv_quote(char *str, size_t len) {
 	if(len == 0) len = strlen(str);

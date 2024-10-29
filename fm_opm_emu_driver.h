@@ -14,6 +14,7 @@ struct fm_opm_emu_driver {
 void fm_opm_emu_driver_init(struct fm_opm_emu_driver *driver, int sample_rate);
 void fm_opm_emu_driver_deinit(struct fm_opm_emu_driver *driver);
 int fm_opm_emu_driver_estimate(struct fm_opm_emu_driver *d, int num_samples);
-void fm_opm_emu_driver_run(struct fm_opm_emu_driver *d, stream_sample_t *outL, stream_sample_t *outR, int num_samples);
+// mdxCP/  to reduce memory & cpu ussage, mono sound only / Layer8
+void fm_opm_emu_driver_run(struct fm_opm_emu_driver *d, stream_sample_t *outL, int num_samples);
 
 #endif /* FM_OPM_EMU_DRIVER_H_ */

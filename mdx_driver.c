@@ -87,7 +87,7 @@ static void mdx_driver_track_init(struct mdx_driver_track *track) {
 	track->detune = 0;
 	track->note = -1;
 	track->portamento = 0;
-	track->adpcm_freq_num = 4;
+	track->adpcm_freq_num = 2;
 }
 
 static void mdx_driver_track_load(struct mdx_driver_track *track, struct mdx_track *mtrack) {
@@ -177,7 +177,10 @@ static void mdx_driver_note_on(struct mdx_driver *r, int track_num) {
 		}
 	} else {
 		if(track->note < 96 && r->pdx_file) {
-			adpcm_driver_play(r->adpcm_driver, track_num - 8, r->pdx_file->samples[track->note].data, r->pdx_file->samples[track->note].len, track->adpcm_freq_num, mdx_adpcm_volume_from_opm(track->opm_volume + r->fade_value));
+	// mdxCP/ to reduce cpu usage / Layer8
+      if(r->pdx_file->samples[track->note].len > 0){
+	  	adpcm_driver_play(r->adpcm_driver, track_num - 8, r->pdx_file->samples[track->note].decoded_data, r->pdx_file->samples[track->note].num_samples, track->adpcm_freq_num, mdx_adpcm_volume_from_opm(track->opm_volume + r->fade_value), track->note);
+      }
 		}
 	}
 }
@@ -628,4 +631,14 @@ int mdx_driver_load(struct mdx_driver *driver, struct mdx_file *mfile, struct pd
 	}
 
 	return 0;
+}
+
+// mdxCP/ mdx file load on heap ;< / Layer8
+void mdx_driver_free(struct mdx_driver *driver){
+  if(driver->mdx_file == NULL)
+    return;
+  if(driver->mdx_file->data == NULL)
+    return;
+  free(driver->mdx_file->data);
+  driver->mdx_file->data = NULL;
 }

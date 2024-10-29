@@ -615,6 +615,8 @@ INLINE void set_connect(struct ym2151 *chip, struct ym2151_operator *om1, int ch
 			om1->mem_connect = &chip->mem;  /* store it anywhere where it will not be used */
 			break;
 	}
+
+
 }
 
 static void refresh_EG(struct ym2151_operator * op) {
@@ -1012,11 +1014,8 @@ struct ym2151 *ym2151_new(int clock, int rate) {
 */
 void ym2151_init(struct ym2151 *chip, int clock, int rate) {
 	int chn;
-
 	memset(chip, 0, sizeof(struct ym2151));
-
 	init_tables();
-
 	//chip->device = device;
 	chip->clock = clock;
 	/*rate = clock/64;*/
@@ -1024,20 +1023,13 @@ void ym2151_init(struct ym2151 *chip, int clock, int rate) {
 	//chip->irqhandler = NULL;                  /* interrupt handler  */
 	//chip->porthandler = NULL;             /* port write handler */
 	init_chip_tables( chip );
-
 	chip->lfo_timer_add = (1<<LFO_SH) * (clock/64.0) / chip->sampfreq;
-
 	chip->eg_timer_add  = (1<<EG_SH)  * (clock/64.0) / chip->sampfreq;
 	chip->eg_timer_overflow = ( 3 ) * (1<<EG_SH);
 
-#ifdef USE_MAME_TIMERS
-	/* this must be done _before_ a call to ym2151_reset_chip() */
-	chip->timer_A = timer_alloc(device->machine, timer_callback_a, chip);
-	chip->timer_B = timer_alloc(device->machine, timer_callback_b, chip);
-#else
 	chip->tim_A      = 0;
 	chip->tim_B      = 0;
-#endif
+
 	for (chn = 0; chn < 8; chn ++)
 		chip->Muted[chn] = 0x00;
 }
@@ -1137,15 +1129,11 @@ static void chan_calc(struct ym2151 *chip, unsigned int chan) {
 	struct ym2151_operator *op;
 	unsigned int env;
 	uint32_t AM = 0;
-
 	if (chip->Muted[chan])
 		return;
-
 	chip->m2 = chip->c1 = chip->c2 = chip->mem = 0;
 	op = &chip->oper[chan*4];   /* M1 */
-
 	*op->mem_connect = op->mem_value;   /* restore delayed sample (MEM) value to m2 or c2 */
-
 	if (op->ams)
 		AM = chip->lfa << (op->ams-1);
 	env = volume_calc(op);
@@ -1167,19 +1155,15 @@ static void chan_calc(struct ym2151 *chip, unsigned int chan) {
 			op->fb_out_curr = op_calc1(op, env, (out<<op->fb_shift) );
 		}
 	}
-
 	env = volume_calc(op+1);    /* M2 */
 	if (env < ENV_QUIET)
 		*(op+1)->connect += op_calc(op+1, env, chip->m2);
-
 	env = volume_calc(op+2);    /* C1 */
 	if (env < ENV_QUIET)
 		*(op+2)->connect += op_calc(op+2, env, chip->c1);
-
 	env = volume_calc(op+3);    /* C2 */
 	if (env < ENV_QUIET)
 		chip->chanout[chan]    += op_calc(op+3, env, chip->c2);
-
 	/* M1 */
 	op->mem_value = chip->mem;
 }
@@ -1686,14 +1670,14 @@ static void advance(struct ym2151 *chip) {
 *   '**buffers' is table of pointers to the buffers: left and right
 *   'length' is the number of samples that should be generated
 */
-void ym2151_update_one(struct ym2151 *chip, SAMP **buffers, int length) {
+// mdxCP/ to reduce cpu usage support mono sound / Layer8
+void ym2151_update_one(struct ym2151 *chip, SAMP *buffers, int length) {
 	int i;
 	signed int outl,outr;
-	SAMP *bufL, *bufR;
+	SAMP *bufL;
 
-	bufL = buffers[0];
-	bufR = buffers[1];
-
+	bufL = buffers;
+//printf("op 1\n");
 #ifdef USE_MAME_TIMERS
 		/* ASG 980324 - handled by real timers now */
 #else
@@ -1709,10 +1693,8 @@ void ym2151_update_one(struct ym2151 *chip, SAMP **buffers, int length) {
 		}
 	}
 #endif
-
 	for(i=0; i<length; i++) {
 		advance_eg(chip);
-
 		chip->chanout[0] = 0;
 		chip->chanout[1] = 0;
 		chip->chanout[2] = 0;
@@ -1721,7 +1703,6 @@ void ym2151_update_one(struct ym2151 *chip, SAMP **buffers, int length) {
 		chip->chanout[5] = 0;
 		chip->chanout[6] = 0;
 		chip->chanout[7] = 0;
-
 		chan_calc(chip, 0);
 		chan_calc(chip, 1);
 		chan_calc(chip, 2);
@@ -1730,38 +1711,34 @@ void ym2151_update_one(struct ym2151 *chip, SAMP **buffers, int length) {
 		chan_calc(chip, 5);
 		chan_calc(chip, 6);
 		chan7_calc(chip);
-
 		outl = chip->chanout[0] & chip->pan[0];
-		outr = chip->chanout[0] & chip->pan[1];
+	//	outr = chip->chanout[0] & chip->pan[1];
 		outl += (chip->chanout[1] & chip->pan[2]);
-		outr += (chip->chanout[1] & chip->pan[3]);
+	//	outr += (chip->chanout[1] & chip->pan[3]);
 		outl += (chip->chanout[2] & chip->pan[4]);
-		outr += (chip->chanout[2] & chip->pan[5]);
+	//	outr += (chip->chanout[2] & chip->pan[5]);
 		outl += (chip->chanout[3] & chip->pan[6]);
-		outr += (chip->chanout[3] & chip->pan[7]);
+	///	outr += (chip->chanout[3] & chip->pan[7]);
 		outl += (chip->chanout[4] & chip->pan[8]);
-		outr += (chip->chanout[4] & chip->pan[9]);
+	//	outr += (chip->chanout[4] & chip->pan[9]);
 		outl += (chip->chanout[5] & chip->pan[10]);
-		outr += (chip->chanout[5] & chip->pan[11]);
+	//	outr += (chip->chanout[5] & chip->pan[11]);
 		outl += (chip->chanout[6] & chip->pan[12]);
-		outr += (chip->chanout[6] & chip->pan[13]);
+	//	outr += (chip->chanout[6] & chip->pan[13]);
 		outl += (chip->chanout[7] & chip->pan[14]);
-		outr += (chip->chanout[7] & chip->pan[15]);
-
+	//	outr += (chip->chanout[7] & chip->pan[15]);
 		outl >>= FINAL_SH;
-		outr >>= FINAL_SH;
+	//	outr >>= FINAL_SH;
 		double outld = outl / 32767.0;
 		if(outld < -1.0) outld = 1.0;
 		else if(outld > 1.0) outld = 1.0;
 		else outld = outld - outld * outld * outld / 3;
-		double outrd = outr / 32767.0;
-		if(outrd < -1.0) outrd = 1.0;
-		else if(outrd > 1.0) outrd = 1.0;
-		else outrd = outrd - outrd * outrd * outrd / 3;
-
-		((SAMP*)bufL)[i] = (SAMP)(outld * 32767);
-		((SAMP*)bufR)[i] = (SAMP)(outrd * 32767);
-
+	//	double outrd = outr / 32767.0;
+	//	if(outrd < -1.0) outrd = 1.0;
+	//	else if(outrd > 1.0) outrd = 1.0;
+	//	else outrd = outrd - outrd * outrd * outrd / 3;
+		((SAMP*)bufL)[i] += (SAMP)(outld * 32767);
+	//	((SAMP*)bufR)[i] = (SAMP)(outrd * 32767);
 #ifdef USE_MAME_TIMERS
 		/* ASG 980324 - handled by real timers now */
 #else

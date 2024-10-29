@@ -118,6 +118,7 @@ void fm_opm_driver_write(struct fm_opm_driver *driver, uint8_t reg, uint8_t val)
 }
 
 void fm_opm_driver_init(struct fm_opm_driver *driver) {
+
 	fm_driver_init(&driver->fm_driver);
 
 	driver->fm_driver.reset_key_sync = fm_opm_driver_reset_key_sync;
@@ -135,14 +136,18 @@ void fm_opm_driver_init(struct fm_opm_driver *driver) {
 	// reset registers
 	for(int i = 0; i < 0x60; i++)
 		fm_opm_driver_write(driver, i, 0x00);
+
 	for(int i = 0x60; i < 0x80; i++)
 		fm_opm_driver_write(driver, i, 0x7f);
+
 	for(int i = 0x80; i < 0xe0; i++)
 		fm_opm_driver_write(driver, i, 0x00);
+
 	for(int i = 0xe0; i <= 0xff; i++)
 		fm_opm_driver_write(driver, i, 0x0f);
 
 	// Key off
 	for(int i = 0; i < 8; i++)
 		fm_opm_driver_write(driver, 0x08, i);
+
 }
