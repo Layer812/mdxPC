@@ -1,107 +1,28 @@
-mdxtools
-========
+# mdxPC 0.3
+MDX (mxdrv file) Player for Cardputer 
 
-A bunch of tools for handling the MDX music format (music for the Sharp X68000 using the MXDRV sound driver).
-
-These tools are aimed at the large collections of MDX files available online (see below for download links). They are meant to convert to other formats, such as vgm, midi and for the curious, MML and dumping the raw MDX data.
-
-* `mdxplay` (WIP) - play a mdx file, currently linux only (libao)
-* `mdx2pcm` (WIP) - render a mdx file to a wav file
-* `mdx2vgm` (WIP) - convert to VGM format
-* `mdxinfo` - extract information from a MDX file, and output in `.csv` format
-* `mdx2mml` - an MML decompiler
-* `mml2mdx` - an MML compiler
-* `mdxdump` - dump all the information in a MDX file.
-* `mdxstat` - analyze and print out some statistics and totals about given MDX files.
-* `mdx2midi` (WIP) - a MML to MIDI file converter. Use in conjunction with pdx2sf2 to hear the samples too.
-* `mididump` - Dump all the info and events in a .mid file. Useful for development. You can also use MidiPiano for a GUI version.
-* `mdx2opm` (WIP) - Extract OPM voices from MDX file (usable in [VOPM](http://www.geocities.jp/sam_kb/VOPM/)).
-* `pdx2wav` - extract the samples from a PDX file, into 16-bit WAV files.
-* `pdx2sf2` - generate a SoundFont file with the samples from the PDX file. Useful for importing a song into a DAW.
-* `pdxinfo` - extract information from a PDX file, and output in `.csv` format
-* `adpcm-decode` - decodes ADPCM data from stdin and outputs 16-bit PCM to stdout (sample rate does not change)
-* `adpcm-encode` - encodes PCM data from stdrin and outputs APDCM data to stdout (sample rate does not change)
-
-The rest of this document is work in progress.
-
-Download music library
-----------------------
-
-* Neko's collection with >28k songs http://nfggames.com/X68000/Music/MXDRV_Neko68k.rar
-* Another collection (to open, use [DiskExplorer](http://hp.vector.co.jp/authors/VA013937/editdisk/index_e.html)) http://nfggames.com/forum2/index.php?topic=4813.0
-
-Ways to listen to MDX files
----------------------------
-
-Windows:
-
-* Winamp plugin (source available): http://www.vesta.dti.ne.jp/~tsato/soft_sound.html
-* Foobar2000 plugin: http://www.vesta.dti.ne.jp/~tsato/soft_fb2k.html
-* MXV, MXDRVg.dll, X68Sound.dll (sources available): http://gorry.haun.org/mx/index_e.html
-* MDXWin: http://www.pat.hi-ho.ne.jp/sata68/mdxwin.html#mdxwin
-* KbMedia Player: http://hwm5.gyao.ne.jp/kobarin/
-
-Unix:
-
-* [MDXPlay](http://homepage3.nifty.com/StudioBreeze/software/mdxplay-e.html), command line player ([mirror](http://vgmrips.net/mirror/mdxplay-20070206.tar.gz))
-
-X68000:
-
-* MMDSP (runs on the X68000 or an emulator): http://www.gamesx.com/wiki/doku.php?id=x68000:sxsi_disk_image_with_games_and_lots_of_mdx_files
-
-About MML (Music Macro Language)
---------------------------------
-MML is a text format, containing sound commands similar to MDX and to MIDI as well.
-
-* MML resources & compilers: http://woolyss.com/chipmusic-mml.php
-* MML description for MXDRV (japanese): http://www16.atwiki.jp/mxdrv/pages/19.html
-* Another MML description: http://www.geocities.co.jp/Playtown-Denei/9628/mck/mckc-e.txt
-* NRTDRV MML description: http://nrtdrv.sakura.ne.jp/index.cgi?page=MML%A5%B3%A5%DE%A5%F3%A5%C9%B0%EC%CD%F7
-
-Compiling MML files to MDX files: Get run68 from http://sourceforge.jp/projects/sfnet_run68/ , then get MDX_TOOL.lzh from http://nfggames.com/x68000/Mirrors/x68pub/x68tools/SOUND/MXDRV/ . Unpack the lzh file in the same folder as run68, then open a command prompt, navigate to the run68 folder, and run `run68.exe mxc.x <file.mml>` .
-
-You can find other ways of compiling on this page: http://gimic.jp/index.php?MDX%E3%83%87%E3%83%BC%E3%82%BF%E4%BD%9C%E6%88%90
-
-Decompiling: Similar procedure, but get DMDX from DMDX.lzh.
-
-
-Other tools and resources
--------------------------
-
-* mdxpg (convert to MIDI): http://www.geocities.jp/sam_kb/VOPM/MDXPG/index.html
-* nfggames x68000 file archive: http://nfggames.com/x68000/
-* especially the tools here (see MDX_TOOL.lzh) http://nfggames.com/x68000/Mirrors/x68pub/x68tools/SOUND/MXDRV/
-
-File formats
-------------
-
-* [MML](docs/MML.md)
-* [MDX](docs/MDX.md)
-* [PDX](docs/PDX.md)
-
-
-About the Sharp x68000
-----------------------
-
-It is a desktop computer released by Sharp in 1987 ([see wikipedia page](http://en.wikipedia.org/wiki/Sharp_X68000)). It contains two sound chips, the YM2151 (8 FM channels) and OKI MSM6258 (1 4-bit PCM). There is an expansion card called Mercury unit that can increase the PCM channels to 8.
-
-Emulators
----------
-
-* [XM6 2.06](http://yohkai.no-ip.info/x680x0/XM6.htm) (source available for 2.05)
-* [XM6 Pro-68k](http://mijet.eludevisibility.org/XM6%20Pro-68k/XM6%20Pro-68k.html)
-* [XM6 TypeG](http://www.geocities.jp/kugimoto0715/xm6g_win32.html)
-* [XM6i](http://xm6i.org/)
-* [WinX68k](http://www.geocities.jp/winx68khighspeed/) (source available on the [XM6 Pro-68k page](http://mijet.eludevisibility.org/XM6%20Pro-68k/XM6%20Pro-68k.html))
-* [Virtual X68000](http://www.vx68k.org/vx68k/) (linux)
-* [More emulators at Zophar's](http://www.zophar.net/x68000.html)
-
-Licensing
----------
-
-Please see the LICENSE file for more information.
-
-Contributing
-------------
-
-If you would like to improve or contribute to this project, I highly encourage you to submit pull requests instead of maintaining your own fork. This way, it is less confusing for users. I will do my best to include your patches.
+VGM Player for Cardputer. It works like [this](https://x.com/i/status/1841840389306909125)<br>
+It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
+## Install
+1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
+2.Put share code 'EdxVqKAhN72avJvy' to User Custom/Share Burn.<br>
+3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.
+## Usage
+1.Push 'M' Button, you can see help.<br>
+<img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
+2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.
+## Limitations (things to do)
+This software provided as No warranty.
+- ADPCM sound dulation seems not valid for some music(like BOSPDX.MDX).
+- Limit numbers, MDX File size < 20Kb, PDX File size < 2MB, files in the directory < 255, directory depth < 7. Path name < 255.
+- Contain bugs...
+- The source code will be uploaded after organized...
+## License
+- Rights of mdxtools original code belong to Vimpirefrog.
+- Rights of customised code belong to Layer8.
+- Please see the LICENSE file for more information.
+## Thanks
+- [Nyoron-x](https://asmpwx.seesaa.net/article/499317001.html)
+- [Loveyan](https://github.com/lovyan03)
+- [Gorry](https://gorry.haun.org/mx/)
+- [Vampirefrog](https://github.com/vampirefrog/mdxtools)
