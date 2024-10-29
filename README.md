@@ -11,12 +11,16 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 1.Push 'M' Button, you can see help.<br>
 <img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
 2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.
+## Compile
+1.Download all of codes into "mdxCP" folder on ArduinoIDE
+2.Change board type to Cardputer
+3.Change partition to Custom
+4.Compile and Upload to Cardputer
 ## Limitations (things to do)
 This software provided as No warranty.
 - ADPCM sound dulation seems not valid for some music(like BOSPDX.MDX).
 - Limit numbers, MDX File size < 20Kb, PDX File size < 2MB, files in the directory < 255, directory depth < 7. Path name < 255.
 - Contain bugs...
-- The source code will be uploaded after organized...
 ## License
 - Rights of mdxtools original code belong to Vimpirefrog.
 - Rights of customised code belong to Layer8.
@@ -26,3 +30,5 @@ This software provided as No warranty.
 - [Loveyan](https://github.com/lovyan03)
 - [Gorry](https://gorry.haun.org/mx/)
 - [Vampirefrog](https://github.com/vampirefrog/mdxtools)
+- [Tamakichi](https://github.com/Tamakichi)
+- [Kadoma-san](https://littlelimit.net/misaki.htm)
