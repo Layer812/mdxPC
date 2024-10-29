@@ -12,7 +12,7 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 <img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
 2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.
 ## Compile
-1.Download all of codes into "mdxCP" folder on ArduinoIDE
+1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.
 2.Change board type to Cardputer
 3.Change partition to Custom
 4.Compile and Upload to Cardputer
