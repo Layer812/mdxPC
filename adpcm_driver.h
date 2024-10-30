@@ -16,7 +16,8 @@ struct adpcm_driver_channel {
 	int freq_num;
 	int skip;
 	int cnt;
-	
+  int fin;
+
 	int volume;
 
 	stream_sample_t *chdata;

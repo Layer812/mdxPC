@@ -42,6 +42,7 @@ int adpcm_mix_driver_channel_init(struct adpcm_driver_channel *channel, int chno
 	adpcm_mix_driver_channel_set_volume(channel, 15);
 	channel->data_pos = 0;
   channel->skip = channel->cnt= 0;
+  channel->fin = 0;
 
 	return 0;
 }
@@ -51,6 +52,7 @@ void adpcm_mix_driver_channel_deinit(struct adpcm_driver_channel *channel) {
 	channel->data_len = 0;
 	channel->data_pos = 0;
   channel->skip = channel->cnt= 0;
+  channel->fin = 0;
 }
 
 int adpcm_mix_driver_channel_is_active(struct adpcm_driver_channel *channel) {
@@ -58,7 +60,7 @@ int adpcm_mix_driver_channel_is_active(struct adpcm_driver_channel *channel) {
 }
 
 stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel *channel, int k) {
-	if(channel->data_len == 0){
+	if(channel->data_len == 0 || channel->fin == 1){
 		return 0;
   }
   // mdxCP/ quick & dirty hack for resample  / Layer8
@@ -66,10 +68,14 @@ stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel 
 		channel->cnt += 320;
 		return 0;
 	}
-
 	channel->cnt = 0;
 	stream_sample_t sample = channel->chdata[channel->data_pos];
-	channel->data_pos = (channel->data_pos >= channel->data_len)? 0: channel->data_pos + 1;
+  if(channel->data_pos >= channel->data_len){
+    channel->data_pos = 0;
+    channel->fin = 1;
+  }else{
+	  channel->data_pos++;
+  }
 	sample = channel->volume * sample / 1024;
 	if(sample > 32767) sample = 32767;
 	if(sample < -32767) sample = -32767;
@@ -82,6 +88,7 @@ int adpcm_mix_driver_channel_play(struct adpcm_driver_channel *channel, short *d
 	channel->freq_num = freq_num;
 	channel->skip = 44100 * 100 / (freqtbl[freq_num] + 1);
 	channel->cnt = 0;
+  channel->fin = 0;
 	channel->slot = slot;
 	adpcm_mix_driver_channel_set_volume(channel, volume);
 	channel->data_pos = 0;
@@ -94,7 +101,7 @@ int adpcm_mix_driver_channel_stop(struct adpcm_driver_channel *chan) {
 	chan->volume = 0;
 	chan->data_pos = 0;
 	chan->cnt = 0;
-
+  chan->fin = 0;
 	return 0;
 }
 
