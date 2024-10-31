@@ -1,10 +1,10 @@
-# mdxPC 0.6
+# mdxPC 1.0
 MDX (mxdrv file) Player for Cardputer 
 It works like [this](https://x.com/i/status/1841840389306909125)<br>
 It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
 ## Install
 1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
-2.Put share code 'jxA5yGmQAlh5xcGB' in User Custom/Share Burn for 0.6 <br>
+2.Put share code 'gw6SwJtF4cZuexyl' in User Custom/Share Burn for 1.0 <br>
 3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.<br>
 
 ## Usage
@@ -18,13 +18,15 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 3.Change partition to Custom<br>
 4.Compile and Upload to Cardputer<br>
 ## Limitations (things to do)
-This software provided as No warranty.
-- Limit numbers, MDX File size < 20Kb, PDX File size < 2MB, files in the directory < 255, directory depth < 7. Path name < 255.
-- Contain bugs...
+This software provided as No warranty.<br>
+Limit numbers.<br>
+- MDX File size < 86Kb, PDX File size < 1.3M (Maximum sizes of confirmed)
+- files in the directory < 255, directory depth < 10. Path name length(include path name) < 255.
 ## Version history
 
 | Version  | Share Code | Change |
 |:----------:|:-----------:|:-------------|
+| 1.0       |gw6SwJtF4cZuexyl   | Fix bugs and support huge files(see limitation)|
 | 0.6       |jxA5yGmQAlh5xcGB   | Make font of title bigger    |
 | 0.51       | E75n6gUNNeAGLH7Y    | Adjust function added for ADPCM volume    |
 | 0.5       | StQT4Eoo6ViDUrQl        | Adjust balance ADPCM with FM        |
