@@ -1,10 +1,10 @@
-# mdxPC 0.5
+# mdxPC 0.51
 MDX (mxdrv file) Player for Cardputer 
 It works like [this](https://x.com/i/status/1841840389306909125)<br>
 It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
 ## Install
 1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
-2.Put share code 'StQT4Eoo6ViDUrQl' in User Custom/Share Burn for 0.5 <br>
+2.Put share code 'E75n6gUNNeAGLH7Y' in User Custom/Share Burn for 0.51 <br>
 3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.<br>
 
 ## Usage
@@ -24,6 +24,7 @@ This software provided as No warranty.
 
 | Version  | Share Code | Change |
 |:----------:|:-----------:|:-------------|
+| 0.51       | E75n6gUNNeAGLH7Y    | Adjust function added for ADPCM volume    |
 | 0.5       | StQT4Eoo6ViDUrQl        | Adjust balance ADPCM with FM        |
 | 0.4       | rLQTaChAORKh0pUh     | Fix bug related to ADPCM sample estimate       |
 | 0.3       | EdxVqKAhN72avJvy      | Initial Commit     |
