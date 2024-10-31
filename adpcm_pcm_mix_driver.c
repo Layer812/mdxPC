@@ -76,7 +76,7 @@ stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel 
   }else{
 	  channel->data_pos++;
   }
-	sample = channel->volume * sample / 1024;
+	sample = channel->volume * sample / 128;
 	if(sample > 32767) sample = 32767;
 	if(sample < -32767) sample = -32767;
 	return sample;

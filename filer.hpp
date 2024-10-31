@@ -1,6 +1,6 @@
 #pragma once
 
-#define VERSION 0.4
+#define VERSION 0.5
 
 #define STATNUM 4
 #define STATMAX 10
