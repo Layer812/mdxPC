@@ -10,12 +10,12 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 ## Usage
 1.Push 'M' Button, you can see help.<br>
 <img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
-2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.
+2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.<br>
 ## Compile
-1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.
-2.Change board type to Cardputer
-3.Change partition to Custom
-4.Compile and Upload to Cardputer
+1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.<br>
+2.Change board type to Cardputer<br>
+3.Change partition to Custom<br>
+4.Compile and Upload to Cardputer<br>
 ## Limitations (things to do)
 This software provided as No warranty.
 - Limit numbers, MDX File size < 20Kb, PDX File size < 2MB, files in the directory < 255, directory depth < 7. Path name < 255.
@@ -23,7 +23,7 @@ This software provided as No warranty.
 ## Version history
 
 | Version  | Share Code | Change |
-|:-----------|------------:|:------------:|
+|:----------:|:-----------:|:-------------|
 | 0.5       | StQT4Eoo6ViDUrQl        | Adjust balance ADPCM with FM        |
 | 0.4       | rLQTaChAORKh0pUh     | Fix bug related to ADPCM sample estimate       |
 | 0.3       | EdxVqKAhN72avJvy      | Initial Commit     |
