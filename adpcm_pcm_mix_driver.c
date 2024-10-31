@@ -3,6 +3,7 @@
 #include "adpcm_pcm_mix_driver.h"
 // mdxCP/  to reduce memory & cpu ussage, change resample method / Layer8
 #include "mamedef.h"
+extern int pcmvol;
 
 uint16_t adpcm_mixer_calc_vol(uint8_t vol) {
 	const uint8_t vol_00_0f[] = {
@@ -76,7 +77,7 @@ stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel 
   }else{
 	  channel->data_pos++;
   }
-	sample = channel->volume * sample / 128;
+	sample = channel->volume * sample / (256 + pcmvol);
 	if(sample > 32767) sample = 32767;
 	if(sample < -32767) sample = -32767;
 	return sample;

@@ -14,6 +14,7 @@ extern bool playend;
 extern char *gtitle;
 extern int sel;
 extern int disp;
+extern int pcmvol;
 
 
 extern struct fl filelist[];
@@ -76,10 +77,10 @@ void dispmenu(){
   M5.Lcd.setTextColor(WHITE);
   M5.Lcd.setCursor(0, 22);
   M5.Lcd.println("   m: menu");
-  M5.Lcd.println("   l: play loop");
+  M5.Lcd.println("   ");
   M5.Lcd.println("   a: play all");
-  M5.Lcd.println("   +: vol up");
-  M5.Lcd.println("   -: vol down");
+  M5.Lcd.println("   +-: maser vol");
+  M5.Lcd.println("   90: pcm vol");
   M5.Lcd.println("   \" \": play/stop");
 }
 
@@ -106,6 +107,16 @@ void hitkey(){
         vol = 0;
       //printf("minus pressed \n");
       M5.Speaker.setVolume(vol);
+    }
+    if (M5Cardputer.Keyboard.isKeyPressed('9')){
+      pcmvol -= 20;
+      if(vol < -255)
+        vol = -255;
+    }
+    if (M5Cardputer.Keyboard.isKeyPressed('0')){
+      pcmvol += 20;
+      if(pcmvol > 255)
+        pcmvol = 255;
     }
     if (M5Cardputer.Keyboard.isKeyPressed('a')){
       playall = !playall;

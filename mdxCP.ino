@@ -35,6 +35,7 @@ int dirnum = 0;
 uint8_t cdir[PATHMAX] = "/";
 uint8_t dirs[DIRMAX][PATHMAX] = {"/", "", "", "", ""};
 int sel = 0, disp = 0;
+int pcmvol;
 
 bool playall;
 bool playloop;
