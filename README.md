@@ -4,7 +4,7 @@ It works like [this](https://x.com/i/status/1841840389306909125)<br>
 It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
 ## Install
 1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
-2.Put share code 'gw6SwJtF4cZuexyl' in User Custom/Share Burn for 1.0 <br>
+2.You can find the firmware on M5Burner or put share code 'gw6SwJtF4cZuexyl' in User Custom/Share Burn for 1.0 <br>
 3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.<br>
 
 ## Usage
