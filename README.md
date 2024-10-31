@@ -20,8 +20,8 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 ## Limitations (things to do)
 This software provided as No warranty.<br>
 Limit numbers.<br>
-- MDX File size < 86Kb, PDX File size < 1.3M (Maximum sizes of confirmed)
-- files in the directory < 255, directory depth < 10. Path name length(include path name) < 255.
+- MDX File size < 86Kb, PDX File size < 1.3M (Maximum sizes as confirmed)
+- Files in the directory < 255, directory depth < 10. Path name length(include path name) < 255.
 ## Version history
 
 | Version  | Share Code | Change |
