@@ -1,16 +1,17 @@
-# mdxPC 0.51
+# mdxPC 0.6
 MDX (mxdrv file) Player for Cardputer 
 It works like [this](https://x.com/i/status/1841840389306909125)<br>
 It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
 ## Install
 1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
-2.Put share code 'E75n6gUNNeAGLH7Y' in User Custom/Share Burn for 0.51 <br>
+2.Put share code 'jxA5yGmQAlh5xcGB' in User Custom/Share Burn for 0.6 <br>
 3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.<br>
 
 ## Usage
 1.Push 'M' Button, you can see help.<br>
 <img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
-2.Select file by 'Cursor key'(Up/Down) without Fn. Hit 'Space Key' to Start/Stop playing.<br>
+2.Select file by 'Cursor key'(Up/Down/Left/Right) without Fn. Hit 'Space Key' to Start/Stop playing.<br>
+3.You can change master volume by +/-. also  change pcm volume by 9/0. 
 ## Compile
 1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.<br>
 2.Change board type to Cardputer<br>
@@ -24,6 +25,7 @@ This software provided as No warranty.
 
 | Version  | Share Code | Change |
 |:----------:|:-----------:|:-------------|
+| 0.6       |jxA5yGmQAlh5xcGB   | Make font of title bigger    |
 | 0.51       | E75n6gUNNeAGLH7Y    | Adjust function added for ADPCM volume    |
 | 0.5       | StQT4Eoo6ViDUrQl        | Adjust balance ADPCM with FM        |
 | 0.4       | rLQTaChAORKh0pUh     | Fix bug related to ADPCM sample estimate       |
