@@ -4,6 +4,7 @@
 // mdxCP/  to reduce memory & cpu ussage, change resample method / Layer8
 #include "mamedef.h"
 extern int pcmvol;
+extern int pcmskip;
 
 uint16_t adpcm_mixer_calc_vol(uint8_t vol) {
 	const uint8_t vol_00_0f[] = {
@@ -66,7 +67,7 @@ stream_sample_t adpcm_mix_driver_channel_get_sample(struct adpcm_driver_channel 
   }
   // mdxCP/ quick & dirty hack for resample  / Layer8
 	if(channel->cnt < channel->skip){
-		channel->cnt += 320;
+		channel->cnt += pcmskip;
 		return 0;
 	}
 	channel->cnt = 0;

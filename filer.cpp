@@ -15,6 +15,7 @@ extern char *gtitle;
 extern int sel;
 extern int disp;
 extern int pcmvol;
+extern int pcmskip;
 
 
 extern struct fl filelist[];
@@ -108,10 +109,20 @@ void hitkey(){
       //printf("minus pressed \n");
       M5.Speaker.setVolume(vol);
     }
+    if (M5Cardputer.Keyboard.isKeyPressed('7')){
+      pcmskip -= 10;
+      if(pcmskip < 200)
+        pcmskip = 200;
+    }
+    if (M5Cardputer.Keyboard.isKeyPressed('8')){
+      pcmskip += 10;
+      if(pcmskip > 400)
+        pcmskip = 400;
+    }
     if (M5Cardputer.Keyboard.isKeyPressed('9')){
       pcmvol -= 20;
-      if(vol < -255)
-        vol = -255;
+      if(pcmvol < -255)
+        pcmvol = -255;
     }
     if (M5Cardputer.Keyboard.isKeyPressed('0')){
       pcmvol += 20;

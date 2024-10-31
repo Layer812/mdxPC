@@ -36,11 +36,12 @@ uint8_t cdir[PATHMAX] = "/";
 uint8_t dirs[DIRMAX][PATHMAX] = {"/", "", "", "", ""};
 int sel = 0, disp = 0;
 int pcmvol;
+#define PCM_SKIP_RATE 300
+int pcmskip = PCM_SKIP_RATE;
 
 bool playall;
 bool playloop;
 bool loopflag;
-
 
 #define SAMPLING_RATE 44100
 #define SAMPLING_BITS 16
@@ -50,7 +51,7 @@ TaskHandle_t taskHandle;
 xSemaphoreHandle xSemaphore = NULL;
 int rd;
 int wd;
-#define WAV_BUFF_COUNT 10
+#define WAV_BUFF_COUNT 12
 int16_t wav_buff[WAV_BUFF_COUNT][BUFF_SIZE + 16];
 int16_t wav_buff_size[WAV_BUFF_COUNT];
 
@@ -217,13 +218,13 @@ struct mdxhdr{
 
 
 struct mdxhdr mhtmp;
+const esp_partition_t *part;
+spi_flash_mmap_handle_t hrom;
+char *fdata;
 
 bool load_mdx(fs::FS &fs, const char *mdxpath) {
-  const esp_partition_t *part;
-  spi_flash_mmap_handle_t hrom;
   File mdx_fd, pdx_fd;
-
-  char *ptr, pdxpath[PATH_MAX], *data, *pdxdata, *mdxdata;
+  char *ptr, pdxpath[PATH_MAX], *pdxdata, *mdxdata;
   int mdxlen, pdxlen, cnt = 0, i, j;
   int err;
   struct mdxhdr *mh;
@@ -235,15 +236,8 @@ bool load_mdx(fs::FS &fs, const char *mdxpath) {
   memset(&mdx_fst, 0, sizeof(struct mdx_file));
   memset(&pdx_fst, 0, sizeof(struct pdx_file));
 
-  part = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_PHY, NULL);
-  if (part == 0)
-    Serial.printf("Couldn't find vgm part!\n");
-  err = esp_partition_mmap(part, 0, 0x300000, SPI_FLASH_MMAP_DATA, (const void **)&data, &hrom);
-  if (err != ESP_OK)
-    Serial.printf("Couldn't map vgm part!\n");
-
   #define MDX_LEN  0x20000
-  mh = (struct mdxhdr *)data;
+  mh = (struct mdxhdr *)fdata;
   mdx_fd = fs.open(mdxpath);
   if (!mdx_fd){
     free(readbuff);
@@ -309,11 +303,12 @@ bool load_mdx(fs::FS &fs, const char *mdxpath) {
       ml -= READBUFF_SIZE;
     }
   }
-  mdxdata = &(data[READBUFF_SIZE]);
+  mdxdata = &(fdata[READBUFF_SIZE]);
 #endif
 
   mdxdata = (char *)malloc(mdxlen);
   if(mdxdata == NULL){
+    printf("Can't alloc %d of memory / Free memory: %d\n", mdxlen, esp_get_free_heap_size());
     free(readbuff);
     return true;
   }
@@ -321,7 +316,7 @@ bool load_mdx(fs::FS &fs, const char *mdxpath) {
   mdx_fd.read((uint8_t *)mdxdata, mdxlen);
 	mdx_file_load(&mdx_fst, (uint8_t *)mdxdata, mdxlen);  
   if(pdxexist)
-   	pdx_file_load(pdx_fd, &pdx_fst, readbuff, pdxlen, part, MDX_LEN, &(data[MDX_LEN])); // todo rewrite seg 
+   	pdx_file_load(pdx_fd, &pdx_fst, readbuff, pdxlen, part, MDX_LEN, &(fdata[MDX_LEN])); // todo rewrite seg 
 	mdx_driver_load(&mdx_driver, &mdx_fst, &pdx_fst);
   strncpy(titlestr, (const char *)mdx_fst.title, 255);
   gtitle = titlestr;
@@ -344,10 +339,17 @@ void initall(){
 SET_LOOP_TASK_STACK_SIZE(8 * 1024);
 
 void setup(){
+  int err;
 //  disableLoopWDT();
   auto cfg = M5.config();
-  M5Cardputer.begin(cfg);
+  part = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_PHY, NULL);
+  if (part == 0)
+    Serial.printf("Couldn't find vgm part!\n");
+  err = esp_partition_mmap(part, 0, 0x300000, SPI_FLASH_MMAP_DATA, (const void **)&fdata, &hrom);
+  if (err != ESP_OK)
+    Serial.printf("Couldn't map vgm part!\n");
 
+  M5Cardputer.begin(cfg);
   int textsize = M5Cardputer.Display.height() / 60;
   if (textsize == 0) {
     textsize = 1;
@@ -373,7 +375,6 @@ void loop(){
   mdx_driver.max_loops = 2;
 
   while(1){ 
-    printf("[APP] Free memory: %d\n", esp_get_free_heap_size());
     pcm_timer_driver_init(&timer_driver, opt_sample_rate);
     adpcm_pcm_mix_driver_init(&adpcm_driver, opt_sample_rate, 0);
     fm_opm_emu_driver_init(&fm_driver, opt_sample_rate);
@@ -399,6 +400,7 @@ void loop(){
 	    disptitle(STATLOOP, gtitle);
 	  else
 	    disptitle(STATCLR, gtitle); 
+    printf("[APP] Free memory: %d\n", esp_get_free_heap_size());
 	  inplay = true;
 		while(!mdx_driver.ended) {
       hitkey();

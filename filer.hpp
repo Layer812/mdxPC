@@ -1,6 +1,6 @@
 #pragma once
 
-#define VERSION 0.6
+#define VERSION 1.0
 
 #define STATNUM 4
 #define STATMAX 10
@@ -10,16 +10,14 @@
 #define STATALL 3
 
 #define DISPMAX 6
-#define LISTMAX 256
-#define PATHMAX 256
+#define LISTMAX 256   // max files in a directory
+#define PATHMAX 256   // filename max include pathname
 
 #define TYPE_MDX  2
 #define TYPE_SDIR  1
 #define TYPE_UDIR  0
 
-#define DIRMAX 10
-
-#define VGMTEMP "/temp.vgm"
+#define DIRMAX 10   // directory depth max
 
 struct fl{
   uint8_t filename[PATHMAX];
