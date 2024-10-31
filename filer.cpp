@@ -32,6 +32,9 @@ void bitdisp(byte x, byte y, uint8_t d ) {
     if (d & 0x80>>i) {
       if(x + i < 232 && y < 64){
           M5.Display.drawPixel(x + i ,y , WHITE);
+          M5.Display.drawPixel(x + i ,y + 1 , WHITE);
+          M5.Display.drawPixel(x + i + 1 ,y , WHITE);
+          M5.Display.drawPixel(x + i + 1 ,y + 1, WHITE);
       }
     }      
   }
@@ -53,38 +56,35 @@ void drawJPChar(byte x, byte y, char *data) {
   // ドット表示
   for (byte i=0; i < 8; i++) {
     for (byte j=0; j < n; j++){
-        bitdisp(x + (j * 8) ,y + i , buf[j][i]);
+        bitdisp(x * 2 + (j * 8) ,y * 2 + i , buf[j][i]);
     }
   }
 }
 
 void disptitle(int stat, char *title){
   M5Cardputer.Display.setCursor(0, 0);
-  M5Cardputer.Display.fillRect(0, 0, 240, 25, BLACK);
+  M5Cardputer.Display.fillRect(0, 0, 240, 34, BLACK);
   M5Cardputer.Display.setTextColor(OLIVE);
   M5Cardputer.Display.printf("mdxPC %.1f ", VERSION);
   M5Cardputer.Display.setTextColor(GREEN);
   M5Cardputer.Display.printf("%s", statstr[stat % STATNUM]);
-  M5Cardputer.Display.drawLine(0,27,240,27,OLIVE);
+  M5Cardputer.Display.drawLine(0,33,240,33,OLIVE);
   if(title){
-    drawJPChar(0,18,title);
+    drawJPChar(0,9,title);
 //    printf("ti: %x %s\n", title, title);
   }
 }
 
 void dispmenu(){
-  M5Cardputer.Lcd.fillRect(20,20,200,100,BLUE);
+  M5Cardputer.Lcd.fillRect(20,36,200,100,BLUE);
   M5.Lcd.setTextColor(WHITE);
-  M5.Lcd.setCursor(0, 22);
+  M5.Lcd.setCursor(0, 38);
   M5.Lcd.println("   m: menu");
-  M5.Lcd.println("   ");
   M5.Lcd.println("   a: play all");
-  M5.Lcd.println("   +-: maser vol");
-  M5.Lcd.println("   90: pcm vol");
+  M5.Lcd.println("   +/-: maser vol");
+  M5.Lcd.println("   9/0: pcm vol");
   M5.Lcd.println("   \" \": play/stop");
 }
-
-
 
 void hitkey(){
   M5Cardputer.update();
@@ -191,8 +191,8 @@ int makemdxlist(fs::FS &fs) {
 void dispfiles(int disp, int sel, bool start){
   int i;
   menuflag = false;
-  M5Cardputer.Display.fillRect(0,28, 240,135, BLACK);
-  M5Cardputer.Display.setCursor(0, 28);
+  M5Cardputer.Display.fillRect(0,36, 240,135, BLACK);
+  M5Cardputer.Display.setCursor(0, 37);
 
 //  M5Cardputer.Display.fillScreen(BLACK);
   for (i = 0; i < DISPMAX; i++){
