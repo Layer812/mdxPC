@@ -9,7 +9,7 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 
 ## Usage
 1.Push 'M' Button, you can see help.<br>
-<img width="50%" src ="https://github.com/user-attachments/assets/019905da-9d3b-4c67-bfcd-6aebdd8362bf"><br>
+<img width="50%" src ="https://github.com/Layer812/mdxPC/blob/master/380501558-019905da-9d3b-4c67-bfcd-6aebdd8362bf.jpg"><br>
 2.Select file by 'Cursor key'(Up/Down/Left/Right) without Fn. Hit 'Space Key' to Start/Stop playing.<br>
 3.You can change master volume by +/-. also  change pcm volume by 9/0. 
 ## Compile
