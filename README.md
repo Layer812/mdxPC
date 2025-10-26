@@ -13,7 +13,7 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 2.Select file by 'Cursor key'(Up/Down/Left/Right) without Fn. Hit 'Space Key' to Start/Stop playing.<br>
 3.You can change master volume by +/-. also  change pcm volume by 9/0. 
 ## Compile
-1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.<br>
+1.Download all of codes into "mdxPC" folder on ArduinoIDE as sketch.<br>
 2.Change board type to Cardputer<br>
 3.Change Flash size to 8MB
 3.Change Flash mode QIO 120Mhz
