@@ -1,10 +1,10 @@
-# mdxPC 1.0
-MDX (mxdrv file) Player for Cardputer 
+# mdxPC 1.1
+MDX (mxdrv file) Player for Cardputer & Cardputer ADV.
 It works like [this](https://x.com/i/status/1841840389306909125)<br>
 It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https://w.atwiki.jp/mxdrv/)) from SDcard in your [Cardputer](https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3).<br>
 ## Install
 1.Install [M5burner](https://docs.m5stack.com/en/uiflow/m5burner/intro)<br>
-2.You can find the firmware on M5Burner or put share code 'gw6SwJtF4cZuexyl' in User Custom/Share Burn for 1.0 <br>
+2.You can find the firmware on M5Burner or put share code 'WU01pyVHIFUtpn6u' in User Custom/Share Burn for 1.1 <br>
 3.After flush the image, put MDX files and PDX files to your SD card (FAT32 formatted) and power on.<br>
 
 ## Usage
@@ -15,8 +15,10 @@ It can play [MDX files]([https://en.wikipedia.org/wiki/VGM_(file_format)](https:
 ## Compile
 1.Download all of codes into "mdxCP" folder on ArduinoIDE as sketch.<br>
 2.Change board type to Cardputer<br>
-3.Change partition to Custom<br>
-4.Compile and Upload to Cardputer<br>
+3.Change Flash size to 8MB
+3.Change Flash mode QIO 120Mhz
+5.Change partition to Custom<br>
+6.Compile and Upload to Cardputer<br>
 ## Limitations (things to do)
 This software provided as No warranty.<br>
 Limit numbers.<br>
@@ -26,6 +28,7 @@ Limit numbers.<br>
 
 | Version  | Share Code | Change |
 |:----------:|:-----------:|:-------------|
+| 1.1       |WU01pyVHIFUtpn6u  | Confirm on ADV. Delete some unused file for compile|
 | 1.0       |gw6SwJtF4cZuexyl   | Fix bugs and support huge files(see limitation)|
 | 0.6       |jxA5yGmQAlh5xcGB   | Make font of title bigger    |
 | 0.51       | E75n6gUNNeAGLH7Y    | Adjust function added for ADPCM volume    |

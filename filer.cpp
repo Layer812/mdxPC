@@ -2,7 +2,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <time.h>
-#include <ESP32-targz.h>
+// #include <ESP32-targz.h>
 #include "filer.hpp"
 #include "misakiSJIS.h"
 
